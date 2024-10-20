@@ -1,0 +1,15 @@
+/*
+main - function name
+(i) - iterator variable. If(i, f, s, ...), then 'f, s, ...' would be parameters
+[0, 100] - range for iterator
+N >> ... - print ... when i % N == 0
+*/
+
+main(i) [0, 100]:
+3 >> "FIZZ"
+5 >> "BUZZ"
+7 >> other(i, 7)
+else >> i
+
+other(i, a, b) [a, a * a]:
+b / a >> "Other"
