@@ -10,6 +10,8 @@ main(i) [0, 100]:
 5 >> "BUZZ"
 7 >> other(i, 7)
 else >> i
+end
 
 other(i, a, b) [a, a * a]:
-b / a >> "Other"
+(b + a) / b * a >> "Other"
+end

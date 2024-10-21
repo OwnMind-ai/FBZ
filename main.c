@@ -1,29 +1,6 @@
-#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "parser/parser.h"
-
-void printToken(Token *t){
-	switch(t->tokenType){
-		case STRING:
-			printf("STRING: %s\n", t->string);
-			break;
-		case NUMBER:
-			printf("NUMBER: %f\n", t->number);
-			break;
-		case OPERATOR:
-			printf("OPERATOR: %s\n", t->op);
-			break;
-		case PUNCTUATION:
-			printf("PUNCTUATION: %c\n", t->punctuation);
-			break;
-		case VARIABLE:
-			printf("VARIABLE: %s\n", t->variable);
-			break;
-		case KEYWORD:
-			printf("KEYWORD: %s\n", t->keyword);
-			break;
-	}
-}
 
 int main(int argc, char *argv[]){
 	if(argc != 2){
@@ -40,10 +17,31 @@ int main(int argc, char *argv[]){
 	}
 
 	Lexer *lexer = createLexer(file);
-	printf("start\n");
 	while(!leof(lexer)){
-		printToken(lnext(lexer));
+		Token *t = lnext(lexer);
+		printToken(t, 0);
 	}
+	/* Parser *parser = createParser(lexer); */
+	/*  */
+	/* FileToken *f = parseFile(parser); */
+	/* for(int i = 0; i < f->size; i++){ */
+	/* 	FunctionToken *t = f->functions[i]; */
+	/* 	printf("FUNCTION %s(", t->name); */
+	/*  */
+	/* 	for(int j = 0; j < t->parametersLength; j++){ */
+	/* 		printf("%s, ", t->parameters[j]); */
+	/* 	} */
+	/*  */
+	/* 	printf(") ["); */
+	/* 	printToken(t->rangeToken->from, 1); */
+	/* 	printToken(t->rangeToken->to, 1); */
+	/* 	printToken(t->rangeToken->step, 1); */
+	/* 	printf("]:\n"); */
+	/*  */
+	/* 	for(int j = 0; j < t->conditionsLength; j++){ */
+	/* 		printToken(t->conditions[j], 1); */
+	/* 	} */
+	/* } */
 
 	fclose(file);
 }

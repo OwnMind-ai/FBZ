@@ -2,7 +2,7 @@
 CC = clang
 
 # Compiler flags
-CFLAGS = -lm
+CFLAGS = -lm -Wall -Wextra -Wpedantic
 
 # Name of the output executable
 TARGET = fbz
@@ -20,9 +20,6 @@ all: $(TARGET)
 # Link the target executable
 $(TARGET): 
 	$(CC) $(CFLAGS) $(SRCS)
-
-clean:
-	rm -f build/$(OBJS) build/$(TARGET)
 
 # Phony targets
 .PHONY: all clean
