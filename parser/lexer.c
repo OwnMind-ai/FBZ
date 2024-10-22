@@ -10,7 +10,7 @@ const char *KEYWORDS[] = {
 	"else", "end"
 };
 
-int isOperatorStart(char c) { return strchr("+-*/%>=", c) != NULL; }
+int isOperatorStart(char c) { return c != 0 && strchr("+-*/%>=", c) != NULL; }
 
 int operatorPrecedence(char c[2]){
 	if(c[0] == '>' && c[1] == '>') return 1;
@@ -83,7 +83,7 @@ FilePosition fgetp(FILE *file){
 	return result;
 }
 
-int isWhitespace(char c){ return strchr(" \r\t", c) != NULL; }
+int isWhitespace(char c){ return c != 0 && strchr(" \r\t", c) != NULL; }
 
 int isNotLineBreak(char c){ return c == '\n'; }
 
@@ -250,7 +250,7 @@ Token* lparseToken(Lexer *lexer){
 	if(peeked == '"' || peeked == '\'')
 		return parseString(lexer);
 
-	if(strchr("()[]{}:,\n", peeked)){
+	if(peeked != 0 && strchr("()[]{}:,\n", peeked)){
 		Token *p = malloc(sizeof(Token));
 		p->tokenType = PUNCTUATION;
 		p->punctuation = fgetc(lexer->file);

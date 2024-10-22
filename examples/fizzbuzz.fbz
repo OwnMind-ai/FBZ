@@ -12,6 +12,6 @@ main(i) [0, 100]:
 else >> i
 end
 
-other(i, a, b) [a, a * a]:
-(b + a) / b * a >> "Other"
+other(i, a, b) [a, a * a, 2]:
+(b + a) / c * d >> "Other"
 end

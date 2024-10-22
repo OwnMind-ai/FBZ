@@ -17,31 +17,25 @@ int main(int argc, char *argv[]){
 	}
 
 	Lexer *lexer = createLexer(file);
-	while(!leof(lexer)){
-		Token *t = lnext(lexer);
-		printToken(t, 0);
+	Parser *parser = createParser(lexer);
+	
+	FileToken *f = parseFile(parser);
+	for(int i = 0; i < f->size; i++){
+		FunctionToken *t = f->functions[i];
+		printf("FUNCTION %s(", t->name);
+	
+		for(int j = 0; j < t->parametersLength; j++)
+			printf("%s, ", t->parameters[j]);
+
+		printf(") [\n");
+		printToken(t->rangeToken->from, 1);
+		printToken(t->rangeToken->to, 1);
+		printToken(t->rangeToken->step, 1);
+		printf("]:\n");
+	
+		for(int j = 0; j < t->conditionsLength; j++)
+			printToken(t->conditions[j], 1);
 	}
-	/* Parser *parser = createParser(lexer); */
-	/*  */
-	/* FileToken *f = parseFile(parser); */
-	/* for(int i = 0; i < f->size; i++){ */
-	/* 	FunctionToken *t = f->functions[i]; */
-	/* 	printf("FUNCTION %s(", t->name); */
-	/*  */
-	/* 	for(int j = 0; j < t->parametersLength; j++){ */
-	/* 		printf("%s, ", t->parameters[j]); */
-	/* 	} */
-	/*  */
-	/* 	printf(") ["); */
-	/* 	printToken(t->rangeToken->from, 1); */
-	/* 	printToken(t->rangeToken->to, 1); */
-	/* 	printToken(t->rangeToken->step, 1); */
-	/* 	printf("]:\n"); */
-	/*  */
-	/* 	for(int j = 0; j < t->conditionsLength; j++){ */
-	/* 		printToken(t->conditions[j], 1); */
-	/* 	} */
-	/* } */
 
 	fclose(file);
 }

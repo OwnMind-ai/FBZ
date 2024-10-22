@@ -19,7 +19,8 @@ int skipLineBreaks(Parser *parser){
 	if(t->tokenType != PUNCTUATION || t->punctuation != '\n') return 0;
 
 	do {
-		lnext(parser->lexer);
+		freeToken(lnext(parser->lexer));
+		if(leof(parser->lexer)) return 1;
 		t = lpeek(parser->lexer);
 	} while(t->tokenType == PUNCTUATION && t->punctuation == '\n');
 
@@ -48,15 +49,17 @@ int delimiter(Token *buf[], Parser *parser, char start, char delimiter, char end
 		if(leof(parser->lexer))
 			stopParsing(parser->lexer, "Unclosed '%c'", start);
 		
+		freeToken(next);
 		next = lnext(parser->lexer);
 		if(next->tokenType != PUNCTUATION || (next->punctuation != delimiter && next->punctuation != end)){
-			printToken(next, 4);
 			stopParsing(parser->lexer, "Expected '%c'", delimiter);
-		} else if(next->punctuation == end)
+		} else if(next->punctuation == end){
+			freeToken(next);
 			return len;
+		}
 	}
 
-	lnext(parser->lexer);
+	freeToken(lnext(parser->lexer));
 
 	return len;
 }
@@ -70,7 +73,7 @@ CallToken *parseCall(char *name, Parser *parser){
 	Token *buff[256];
 	call->argsLen = delimiter(buff, parser, '(', ',', ')', &parseExpression, 0);
 	call->args = calloc(call->argsLen, sizeof(Token*));
-	memcpy(call->args, buff, call->argsLen);
+	memmove(call->args, buff, call->argsLen * sizeof(Token*));
 
 	return call;
 }
@@ -105,11 +108,12 @@ Token *parseToken(Parser *parser){
 
 Token *buildExpressionTree(Token *prev, Parser *parser, int precedence){
 	Token *peeked = lpeek(parser->lexer);
-	if(peeked->tokenType == OPERATOR && operatorPrecedence(peeked->op) >= precedence){
+	if(peeked->tokenType == OPERATOR && operatorPrecedence(peeked->op) > precedence){
 		OperationToken *operation = malloc(sizeof(OperationToken));
-		memcpy(operation->op, lnext(parser->lexer)->op, 2);
+		memmove(operation->op, peeked->op, 2);
+		freeToken(lnext(parser->lexer));
 		operation->left = prev;
-		operation->right = buildExpressionTree(parseExpression(parser), parser, operatorPrecedence(peeked->op));
+		operation->right = buildExpressionTree(parseToken(parser), parser, operatorPrecedence(operation->op));
 
 		Token *t = malloc(sizeof(Token));
 		t->tokenType = OPERATION;
@@ -143,6 +147,7 @@ FunctionToken *parseFunction(Parser *parser){
 			stopParsing(parser->lexer, "Invalid parameter");
 
 		token->parameters[i] = t->variable;
+		free(t);
 	}
 
 	int rn = delimiter(buffer, parser, '[', ',', ']', &parseExpression, 1);
@@ -157,10 +162,12 @@ FunctionToken *parseFunction(Parser *parser){
 		buffer[2] = num;
 	}
 	r->step = buffer[2];
+	token->rangeToken = r;
 
 	Token *n = lnext(parser->lexer);
 	if(n->tokenType != PUNCTUATION || n->punctuation != ':')
 		stopParsing(parser->lexer, "Expected ':'");
+	freeToken(n);
 
 	skipLineBreaks(parser);
 	token->conditionsLength = 0;
@@ -170,10 +177,12 @@ FunctionToken *parseFunction(Parser *parser){
 		token->conditions = realloc(token->conditions, ++token->conditionsLength * sizeof(Token*));
 		token->conditions[token->conditionsLength - 1] = parseExpression(parser);
 
-		if(!skipLineBreaks(parser)) stopParsing(parser->lexer, "New line expected");
+		if(!skipLineBreaks(parser)){ 
+			stopParsing(parser->lexer, "New line expected");
+		}
 	}
 
-	lnext(parser->lexer);   // skips 'end'
+	freeToken(lnext(parser->lexer));   // skips 'end'
 
 	return token;
 }
@@ -219,12 +228,12 @@ void printToken(Token *t, int leftpad){
 			printf("KEYWORD: %s\n", t->keyword);
 			break;
 		case OPERATION:
-			printf("OPERATION (%s):\n", t->operation->op);
+			printf("OPERATION '%s':\n", t->operation->op);
 			printToken(t->operation->left, leftpad + 1);
 			printToken(t->operation->right, leftpad + 1);
 			break;
 		case CALL:
-			printf("CALL (%s):\n", t->call->function);
+			printf("CALL '%s':\n", t->call->function);
 			for(int i = 0; i < t->call->argsLen; i++)
 				printToken(t->call->args[i], leftpad + 1);
 			break;
@@ -232,4 +241,26 @@ void printToken(Token *t, int leftpad){
 			printf("UNDEFINED");
 			break;
 	}
+}
+
+void freeToken(Token *t){
+	switch(t->tokenType){
+		case STRING: free(t->string); break;
+		case VARIABLE: free(t->variable); break;
+		case KEYWORD: free(t->keyword); break;
+		case OPERATION:
+			freeToken(t->operation->left);
+			freeToken(t->operation->right);
+			free(t->operation);
+			break;
+		case CALL:
+			for(int i = 0; i < t->call->argsLen; i++)
+				freeToken(t->call->args[i]);
+			free(t->call->function);
+			free(t->call);
+			break;
+		case OPERATOR: case NUMBER: case PUNCTUATION: break;
+	}
+
+	free(t);
 }

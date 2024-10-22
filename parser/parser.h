@@ -21,5 +21,6 @@ typedef struct Parser Parser;
 Parser *createParser(Lexer *lexer);
 FileToken *parseFile(Parser *parser);
 void printToken(Token *t, int leftpad);
+void freeToken(Token *t);
 
 #endif
