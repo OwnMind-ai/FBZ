@@ -179,15 +179,17 @@ Token *parseString(Lexer *lexer){
 	int len = 0;
 
 	char c = fgetc(lexer->file);
-	while(c != literal){
-		if(feof(lexer->file) || c == '\n')
-			stopParsing(lexer, "Unterminated string literal");
+	if(c == '\\')
+		c = escapeChar(fgetc(lexer->file));
 
+	while(c != literal){
 		result = realloc(result, ++len + 1);
 		result[len - 1] = c;
 
 		c = fgetc(lexer->file);
-		
+		if(feof(lexer->file) || c == '\n')
+			stopParsing(lexer, "Unterminated string literal");
+
 		if(c == '\\')
 			c = escapeChar(fgetc(lexer->file));
 	}

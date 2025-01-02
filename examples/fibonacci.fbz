@@ -1,0 +1,16 @@
+main(i) [1, 1]:
+	// The last arguments is the length of the sequence
+	1 >> fibonacci(1, 0, 0, 20)
+end
+
+fibonacci(i, a, b, sum, n) [1, n]:
+	(sum = a + b) + n >> "Shouldn't be printed"
+
+	// Uncomment to print the whole sequence
+	//1 >> sum
+
+	(a = b) + (b = sum) + n >> "Shouldn't be printed"
+
+	n >> "\nRESULT: "
+	n >> sum
+end

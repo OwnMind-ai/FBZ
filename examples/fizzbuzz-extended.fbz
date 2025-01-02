@@ -8,5 +8,11 @@ N >> ... - print ... when i % N == 0
 main(i) [0, 100]:
 	3 >> "FIZZ"
 	5 >> "BUZZ"
+	3 + 4 >> concat("SQUARED: ", i * i)
 	else >> i
+end
+
+concat(i, f, s) [1, 1]:
+	1 >> f
+	1 >> s
 end
