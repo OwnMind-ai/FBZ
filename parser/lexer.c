@@ -85,7 +85,7 @@ FilePosition fgetp(FILE *file){
 
 int isWhitespace(char c){ return c != 0 && strchr(" \r\t", c) != NULL; }
 
-int isNotLineBreak(char c){ return c == '\n'; }
+int isNotLineBreak(char c){ return c != '\n'; }
 
 int isNumber(char c){ return '0' <= c && c <= '9'; }
 

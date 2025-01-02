@@ -2,13 +2,14 @@
 CC = clang
 
 # Compiler flags
-CFLAGS = -lm -Wall -Wextra -Wpedantic
+CFLAGS = -lm -Wall -Wextra -Wpedantic -Wc23-extensions 
 
 # Name of the output executable
 TARGET = fbz
 
 # Source files
-SRCS = $(wildcard *.c) $(wildcard parser/*.c) $(wildcard parser/*.h) 
+SRCS = $(wildcard *.c) $(wildcard parser/*.c) $(wildcard parser/*.h) $(wildcard runtime/*.c) $(wildcard runtime/*.h) 
+
 
 # Object files
 OBJS = $(SRCS:.c=.o)
