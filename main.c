@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[]){
 	if(argc != 2){
-		fprintf(stderr, "No path to source was specified. Example: ./fbz main.fbx\n");
+		fprintf(stderr, "No path to source was specified. Example: ./fbz main.fbz\n");
 		return 1;
 	}
 
